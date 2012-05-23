@@ -1,0 +1,55 @@
+body {
+  font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+  height: 100%;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+#wrapper {
+  margin: 0 auto;
+  width: 800px;
+}
+
+section {
+  position: relative;
+}
+
+section p {
+}
+
+.panel {
+  margin: 0 auto;
+  width: 800px;  
+  position: relative;
+  top: 45%;
+ }
+
+.dictate span {
+  margin-right: 5px;
+  border-bottom: 2px solid black;
+  width: 1em;
+  display: inline-block;
+  vertical-align: -5px;
+  text-align: center;
+}
+
+.dictate .space {
+  border: none;
+}
+
+.dictate .active {
+  background-color: #EEEEEE;
+}
+
+.dictate .exposed {
+  border: none;
+}
+
+.stamp {
+  position: absolute;
+  top: 0;
+  left: 200px;
+  display: none;
+}
