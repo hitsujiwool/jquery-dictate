@@ -234,11 +234,11 @@
     };
 
     api.giveup = function() {
+      stats.giveup = true;
       while(spans.length > 0) {
         render(problem.get());
         problem.skip();
       }
-      stats.giveup = true;
       return api;
     };
 
