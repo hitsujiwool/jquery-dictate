@@ -29,16 +29,21 @@
       return this;
     };
     
+    EventEmitter.prototype.removeAllListeners = function(event) {
+      this.callbacks[event] = [];
+    };
+
     function dictate(str, options) {    
       return new Dictate(str, options);
     };
     
     function Dictate(str, options) {
       var defaults = {
-        caseInsentive: false
+        caseInsentive: false,
+        skip: function() {}
       };
       options = options || {};
-      for (var key in options) {
+      for (var key in defaults) {
         defaults[key] = options[key];
       }
       EventEmitter.call(this);
@@ -46,12 +51,9 @@
       this.counter = 0;
       this.options = defaults;
     };
+
     Dictate.prototype = new EventEmitter;
-    
-    Dictate.prototype.skip = function(callback) {
-      this.skip = callback;    
-    };
-    
+        
     Dictate.prototype.next = function() {
       this.counter++;
       if (this.counter >= this.str.length) {
@@ -70,23 +72,29 @@
     };
     
     Dictate.prototype.input = function(chr) {
-      var next;
       if (this.options.caseInsentive ? (this.get() === chr.toUpperCase() || this.get() === chr.toLowerCase()) : this.get() === chr) {
-        this.emit('accept', this.get());
-        do {
-          if (!this.hasNext()) break;
-          next = this.next().get();
-        } while (this.skip(next))
+        this.emit('accept', this.get()).skip();
       } else {
         this.emit('reject', chr);
       }
     };
     
+    Dictate.prototype.skip = function() {
+      var next;
+      do {
+        if (!this.hasNext()) break;
+        next = this.next().get();
+      } while (this.options.skip(next) && this.emit('skip', next))
+      return this;
+    };
+
     return dictate;
 
   })({});
   
   $.fn.dictate = function() {
+    var WORD_BOUNDARY = '.,:;? ';
+    
     var $this = this;
 
     var args = Array.prototype.slice.apply(arguments),
@@ -98,7 +106,7 @@
         problem,
         spans;
 
-    var accept = function(chr) {
+    function render(chr) {
       $this.stop();
       var $span = $(spans.shift());
       $span.removeClass('active');
@@ -106,19 +114,26 @@
       if (spans.length > 0) $(spans[0]).addClass('active');
     };
 
-    var reject = function(chr) {
+    function accept(chr) {
+      render(chr);
+    };
+
+    function reject(chr) {
       if (!$this.is(':animated')) {
         $this.effect('shake', { times: 3, distance: 6 }, 50);
       }
     };
 
-    var complete = function() {};
+    function complete() {};
 
     if (typeof last == 'object') {
       args.pop();
       exposed = last.exposed;
       delete last.exposed;
-      options = last;      
+      options = last;
+      options.skip = function(chr) {
+        return exposed.indexOf(chr) > -1 || chr === ' ';
+      };
     }
     sentences = args;
 
@@ -133,7 +148,7 @@
         if (chr === ' ') $span.addClass('space');
         if (exposed.indexOf(chr) > -1) {
           $span.addClass('exposed');
-          $span.text(chr);      
+          $span.text(chr);
         }
         $p.append($span);
       }
@@ -143,14 +158,13 @@
     spans = $('#panel span:not(".space"):not(".exposed")').toArray();
     problem = dictate(args.join(''), options);
 
-    problem.skip(function(chr) {
-      return exposed.indexOf(chr) > -1 || chr === ' ';
-    });
-    
     problem.on('accept', options.accept || accept);
     problem.on('reject', options.reject || reject);
     problem.on('complete', options.complete || complete);
     
+    /*
+     * export APIs 
+     */    
     api.start = (function() {
       var alreadyStarted = false;
       return function() {
@@ -164,6 +178,27 @@
         return api;
       };
     })();
+    
+    api.showNextChar = function() {
+      if (spans.length === 0) return api;
+      render(problem.get());
+      problem.skip();
+      return api;
+    };
+
+    api.showNextWord = function() {
+      var skipped;
+      if (spans.length === 0) return api;
+      problem.on('skip', function(chr) {
+        skipped = chr;
+      });
+      do {
+        render(problem.get());
+        problem.skip();
+      } while (WORD_BOUNDARY.indexOf(skipped) === -1)
+      problem.removeAllListeners('skip');
+      return api;
+    };
 
     $this.data('dictate', api);
     return $this;

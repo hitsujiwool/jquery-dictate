@@ -16,35 +16,10 @@ section {
   position: relative;
 }
 
-section p {
-}
-
 .panel {
   margin: 0 auto;
   width: 800px;  
   position: relative;
-  top: 45%;
- }
-
-.dictate span {
-  margin-right: 5px;
-  border-bottom: 2px solid black;
-  width: 1em;
-  display: inline-block;
-  vertical-align: -5px;
-  text-align: center;
-}
-
-.dictate .space {
-  border: none;
-}
-
-.dictate .active {
-  background-color: #EEEEEE;
-}
-
-.dictate .exposed {
-  border: none;
 }
 
 .stamp {
