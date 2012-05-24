@@ -1,0 +1,22 @@
+/*
+ * Edit this stylesheet as you like!
+ */
+.dictate span {
+  margin-right: 5px;
+  border-bottom: 2px solid black;
+  width: 1em;
+  display: inline-block;
+  text-align: center;
+}
+
+.dictate .space {
+  border: none;
+}
+
+.dictate .active {
+  background-color: #EEEEEE;
+}
+
+.dictate .exposed {
+  border: none;
+}
