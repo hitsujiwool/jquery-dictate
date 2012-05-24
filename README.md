@@ -2,6 +2,8 @@
 
 jquery-dictate provides simple English dictation interface.
 
+[http://hitsujiwool.github.com/jquery-dictate/](http://hitsujiwool.github.com/jquery-dictate/)
+
 ## Basic Usage
 
     $('#target').dictate('Sentence comes here');    
@@ -15,12 +17,29 @@ jquery-dictate provides simple English dictation interface.
       accept: function() { // overwrite callback triggered when the input is accepted }
       reject: function() { // overwrite callback triggered when the input is rejected }
       complete: function() { // overwrite callback triggered when the all characters are exposed }
+      afterAccept: function() { // triggered after accept callback }
+      afterReject: function() { // triggered after reject callback }
+      afterComplete: function() { // triggerd after complete callback }
     })
     
 ## API
 
     var api = $('#target').data('dictate');
-    api.start();
+    api.start(); // start dictation
+    api.showNextChar(); // show next character by force
+    api.showNextWord(); // show next word by force
+    api.giveup(); // show all
+    api.getStats(); // some information (see below)
+
+## Stats
+
+You can get some information via `api.getStats()`, which returns simple object.
+
+* characters: number of characters
+* accepted: number of accepted characters
+* opened: number of characters shown by force
+* errors: number of input errors
+* giveup: whether `api.giveup()` was called or not
 
 ## License
 
