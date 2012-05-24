@@ -7,4 +7,12 @@ $(function() {
       $panel.next().show();
     }
   }).data('dictate').start();
+  
+  $('.char').on('click', function() {
+    api.showNextChar();
+  });
+
+  $('.word').on('click', function() {
+    api.showNextWord();
+  });
 });
