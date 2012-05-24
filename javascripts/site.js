@@ -4,7 +4,14 @@ $(function() {
     exposed: ".',?!",
     caseInsentive: true,    
     complete: function() {
-      $panel.next().show();
+      var stats = api.getStats();
+      if (stats.giveup) {
+        $panel.siblings('.bad').show();
+      } else if (stats.opened > 0) {
+        $panel.siblings('.good').show();
+      } else {
+        $panel.siblings('.best').show();
+      }
     }
   }).data('dictate').start();
   
@@ -14,5 +21,9 @@ $(function() {
 
   $('.word').on('click', function() {
     api.showNextWord();
+  });
+  
+  $('.giveup').on('click', function() {
+    api.giveup();
   });
 });

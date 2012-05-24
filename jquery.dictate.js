@@ -106,6 +106,14 @@
         problem,
         spans;
 
+    var stats = {
+      characters: 0,
+      accepted: 0, 
+      opened: 0,
+      errors: 0,
+      giveup: false
+    };
+    
     function render(chr) {
       $this.stop();
       var $span = $(spans.shift());
@@ -124,7 +132,7 @@
       }
     };
 
-    function complete() {};
+    function complete(data) {};
 
     if (typeof last == 'object') {
       args.pop();
@@ -158,9 +166,24 @@
     spans = $('#panel span:not(".space"):not(".exposed")').toArray();
     problem = dictate(args.join(''), options);
 
-    problem.on('accept', options.accept || accept);
-    problem.on('reject', options.reject || reject);
-    problem.on('complete', options.complete || complete);
+    stats.characters = spans.length;
+
+    problem.on('accept', function(chr) {
+      stats.accepted++;
+      (options.accept || accept)(chr);
+      if (options.afterAccept) options.afterAccept(chr);
+    });
+    
+    problem.on('reject', function(chr) {
+      stats.errors++;
+      (options.reject || reject)(chr);
+      if (options.afterReject) options.afterReject(chr);
+    });
+    
+    problem.on('complete', function() {
+      (options.complete || complete)();
+      if (options.afterComplete) options.afterComplete();
+    });
     
     /*
      * export APIs 
@@ -183,6 +206,7 @@
       if (spans.length === 0) return api;
       render(problem.get());
       problem.skip();
+      stats.opened++;
       return api;
     };
 
@@ -195,8 +219,26 @@
       do {
         render(problem.get());
         problem.skip();
+        stats.opened++;
       } while (WORD_BOUNDARY.indexOf(skipped) === -1)
       problem.removeAllListeners('skip');
+      return api;
+    };
+    
+    api.getStats = function() {
+      var clone = {};
+      for (var key in stats) {
+        clone[key] = stats[key];
+      }
+      return clone;
+    };
+
+    api.giveup = function() {
+      stats.giveup = true;
+      while(spans.length > 0) {
+        render(problem.get());
+        problem.skip();
+      }
       return api;
     };
 
