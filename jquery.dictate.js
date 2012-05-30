@@ -163,7 +163,7 @@
       $this.append($p);
     });
 
-    spans = $('#panel span:not(".space"):not(".exposed")').toArray();
+    spans = $('span:not(".space"):not(".exposed")', this).toArray();
     problem = dictate(args.join(''), options);
 
     stats.characters = spans.length;
