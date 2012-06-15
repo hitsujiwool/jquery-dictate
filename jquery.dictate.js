@@ -224,7 +224,7 @@
         render(problem.get());
         problem.skip();
         stats.opened++;
-      } while (WORD_BOUNDARY.indexOf(skipped) === -1)
+      } while (WORD_BOUNDARY.indexOf(skipped) === -1 && problem.hasNext())
       problem.removeAllListeners('skip');
       return api;
     };
