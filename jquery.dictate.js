@@ -102,7 +102,7 @@
         options = {},
         api = {},
         exposed = '',
-        sentences,
+        sentences = [],
         problem,
         spans;
 
@@ -143,7 +143,10 @@
         return exposed.indexOf(chr) > -1 || chr === ' ';
       };
     }
-    sentences = args;
+
+    for (var i = 0, len = args.length; i < len; i++) {
+      sentences.push(args[i].replace(/^[\s　]+|[\s　]+$/g, ''));
+    }
 
     $this.addClass('dictate');
 
@@ -192,8 +195,9 @@
       var alreadyStarted = false;
       return function() {
         if (!alreadyStarted) {
+          problem.next();
           alreadyStarted = true;
-          $this.find('.sentence:first span:first').addClass('active');
+          $this.find('.sentence:first span:not(".exposed"):first').addClass('active');
           $(window).on('keypress', function(e) {
             problem.input(String.fromCharCode(e.charCode));
           });
