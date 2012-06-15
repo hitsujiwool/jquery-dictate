@@ -195,8 +195,8 @@
       var alreadyStarted = false;
       return function() {
         if (!alreadyStarted) {
-          problem.next();
           alreadyStarted = true;
+          if (options.skip(problem.get())) problem.skip();
           $this.find('.sentence:first span:not(".exposed"):first').addClass('active');
           $(window).on('keypress', function(e) {
             problem.input(String.fromCharCode(e.charCode));
