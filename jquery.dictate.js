@@ -128,7 +128,19 @@
 
     function reject(chr) {
       if (!$this.is(':animated')) {
-        $this.effect('shake', { times: 3, distance: 6 }, 50);
+        var interval=50,times=3,distance=6;
+        var t0=new Date();
+        function animation(){
+          var t=(new Date()-t0)/interval;
+          if(t<2*times){
+            $this.css({left:distance*Math.sin(Math.PI*t)});
+            setTimeout(animation,10);
+          }
+          else{
+            $this.css({left:0})
+          }
+        }
+        animation();
       }
     };
 
