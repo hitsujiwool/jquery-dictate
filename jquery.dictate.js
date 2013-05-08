@@ -200,6 +200,8 @@
           $this.find('.sentence:first span:not(".exposed"):first').addClass('active');
           $(window).on('keypress', function(e) {
             problem.input(String.fromCharCode(e.charCode));
+            // 一律keypressをブロックしてもいいけど、スペースの場合だけ
+            return e.charCode === 32 ? false : true;
           });
         }
         return api;
